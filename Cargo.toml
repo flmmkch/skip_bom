@@ -1,6 +1,6 @@
 [package]
 name = "skip_bom"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2018"
 description = "Skip the optional encoding BOM at the start of a file if it exists."
 repository = "https://github.com/flmmkch/skip_bom"

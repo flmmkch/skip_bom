@@ -1,6 +1,11 @@
 # skip_bom
 
-Skip the optional UTF-8 BOM at the start of a file if it exists.
+Skip the optional encoding BOM at the start of a file if it exists.
+As of now, only the UTF-8 BOM is supported.
+
+### References
+
+* [The official Unicode FAQ](https://www.unicode.org/faq/utf_bom.html).
 
 ### Documentation
 
