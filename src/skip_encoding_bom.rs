@@ -81,6 +81,17 @@ impl<R: Read> SkipEncodingBom<R> {
     pub fn into_inner(self) -> R {
         self.reader
     }
+
+    /// Get a shared reference to the underlying reader.
+    pub fn get_ref(&self) -> &R {
+        &self.reader
+    }
+
+    /// Get a mutable reference to the underlying reader. 
+    pub fn get_mut(&mut self) -> &mut R {
+        &mut self.reader
+    }
+
     fn state_after_initial(start_bytes: &BomBytesPushBuffer, reader: &mut R) -> Result<NextStateResult> {
         use NextStateResult::*;
         match BomState::try_read_bom(start_bytes, reader)? {

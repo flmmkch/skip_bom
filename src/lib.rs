@@ -31,6 +31,9 @@
 //! assert_eq!(Some(Some(BomType::UTF8)), reader.bom_found());
 //! ```
 
+#[cfg(doctest)]
+doc_comment::doctest!("../README.md");
+
 /// Re-exported from [`std::io::Result`]
 pub type Result<T> = std::io::Result<T>;
 

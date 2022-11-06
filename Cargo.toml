@@ -1,6 +1,6 @@
 [package]
 name = "skip_bom"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2018"
 description = "Skip the optional encoding BOM at the start of a file if it exists."
 repository = "https://github.com/flmmkch/skip_bom"
@@ -14,3 +14,8 @@ keywords = ["BOM", "read"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+# Empty for now
+
+[dev-dependencies]
+doc-comment = "0.3"

@@ -141,3 +141,29 @@ fn test_skip_empty_stream() {
     assert_eq!(None, reader.bom_found());
     assert_eq!(0, buf.len(), "{:?}", buf.as_slice());
 }
+
+#[test]
+fn test_skip_bom_progressive() {
+    let mut reader = SkipEncodingBom::new(Cursor::new(b"\xEF\xBB".to_vec()));
+    let mut buf = Default::default();
+    let _ = reader.read_to_end(&mut buf).unwrap();
+    assert_eq!(0, buf.len(), "{:?}", buf.as_slice());
+    assert_eq!(None, reader.bom_found());
+    reader.get_mut().get_mut().extend_from_slice(b"\xBFThis stream has a BOM.");
+    let _ = reader.read_to_end(&mut buf).unwrap();
+    assert_eq!(b"This stream has a BOM.", buf.as_slice());
+    assert_eq!(Some(BomType::UTF8), reader.bom_found().unwrap());
+}
+
+#[test]
+fn test_skip_no_bom_progressive() {
+    let mut reader = SkipEncodingBom::new(Cursor::new(b"\xEF\xBB".to_vec()));
+    let mut buf = Default::default();
+    let _ = reader.read_to_end(&mut buf).unwrap();
+    assert_eq!(0, buf.len(), "{:?}", buf.as_slice());
+    assert_eq!(None, reader.bom_found());
+    reader.get_mut().get_mut().extend_from_slice(b"This stream has no BOM actually.");
+    let _ = reader.read_to_end(&mut buf).unwrap();
+    assert_eq!(b"\xEF\xBBThis stream has no BOM actually.", buf.as_slice());
+    assert_eq!(None, reader.bom_found().unwrap());
+}
