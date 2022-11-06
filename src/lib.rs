@@ -48,6 +48,3 @@ pub(crate) use bom_state::*;
 
 mod byte_push_buffer;
 pub(crate) use byte_push_buffer::*;
-
-/// UTF-8 specific definitions
-pub mod utf8;

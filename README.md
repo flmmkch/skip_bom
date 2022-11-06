@@ -5,9 +5,11 @@
 [![crates.io](https://img.shields.io/crates/v/skip_bom.svg)](https://crates.io/crates/skip_bom)
 [![docs.rs](https://img.shields.io/docsrs/skip_bom?maxAge=3600)](https://docs.rs/skip_bom)
 
-Skip the optional encoding BOM at the start of an I/O stream if it exists.
+Skip the optional encoding BOM (Byte Order Mark) at the start of an I/O stream if it exists.
+
 The `SkipEncodingBom` data structure does not make any dynamic allocations and supports progressive stream reads.
-As of now, only the UTF-8 BOM is supported.
+
+A list of supported BOMs can be found [in the crate documentation](https://docs.rs/skip_bom/*/skip_bom/enum.BomType.html).
 
 ## Examples
 
@@ -64,6 +66,7 @@ assert_eq!(Some(BomType::UTF8), reader.bom_found().unwrap());
 ## References
 
 * [The official Unicode FAQ](https://www.unicode.org/faq/utf_bom.html)
+* [Byte order mark on Wikipedia](https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding)
 
 ## Documentation
 

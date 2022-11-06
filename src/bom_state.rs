@@ -1,6 +1,6 @@
 use std::io::{Cursor, Read};
 
-use super::{BomType, BomBytesArray, BomBytesPushBuffer, Result, utf8};
+use super::{AllBomsBytesTest, BomType, BomBytesArray, BomBytesPushBuffer, Result};
 
 /// Reader BOM skipping state
 #[derive(Debug, Clone)]
@@ -46,34 +46,15 @@ impl BomState {
         let read_slice = &mut new_start_bytes_buffer[start_bytes_slice.len()..];
         let current_bytes_read = reader.read(read_slice)?;
         let total_bom_bytes_read = start_bytes_slice.len() + current_bytes_read;
-        match Self::test_incomplete_bom_bytes(&new_start_bytes_buffer[..total_bom_bytes_read]) {
+        match BomType::try_find_bytes_bom(&new_start_bytes_buffer[..total_bom_bytes_read]) {
             // the BOM presence was determined
-            Ok((bom_type, additional_bytes)) => {
+            AllBomsBytesTest::Complete { bom_type, additional_bytes } => {
                 let bytes_after_bom = BomBytesPushBuffer::from_slice(additional_bytes);
                 Ok(TryReadBomResult::Complete { bom_type, bytes_after_bom })
             },
-            Err(()) => {
+            AllBomsBytesTest::Incomplete => {
                 let bytes_after_bom = BomBytesPushBuffer::from_array(new_start_bytes_buffer, total_bom_bytes_read);
                 Ok(TryReadBomResult::Incomplete(bytes_after_bom))
-            }
-        }
-    }
-    
-    // returns Ok((Some(bom_type), additional_bytes_slice)) if this is certain to be a BOM, Ok((None, bytes_slice)) if the bytes are certain not to be a BOM, and Err(()) otherwise
-    fn test_incomplete_bom_bytes<'a>(tested_bytes: &'a [u8]) -> std::result::Result<(Option<BomType>, &'a [u8]), ()> {
-        let slice_len = tested_bytes.len();
-        if slice_len < utf8::BOM_LENGTH as _ {
-            if tested_bytes == &utf8::BOM[..slice_len] {
-                Err(())
-            }
-            else {
-                Ok((None, tested_bytes))
-            }
-        } else {
-            if tested_bytes[..utf8::BOM_LENGTH as usize] == utf8::BOM {
-                Ok((Some(BomType::UTF8), &tested_bytes[utf8::BOM_LENGTH as usize..]))
-            } else {
-                Ok((None, tested_bytes))
             }
         }
     }

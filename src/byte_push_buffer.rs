@@ -1,4 +1,3 @@
-pub const MAX_BOM_LENGTH: u8 = super::utf8::BOM_LENGTH;
 
 #[derive(Default, Debug, Clone, Copy)]
 pub struct BomBytesPushBuffer {
@@ -41,4 +40,4 @@ impl AsRef<[u8]> for BomBytesPushBuffer {
     }
 }
 
-pub type BomBytesArray = [u8; MAX_BOM_LENGTH as usize];
+pub type BomBytesArray = [u8; crate::MAX_BOM_LENGTH as usize];
