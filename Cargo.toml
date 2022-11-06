@@ -7,7 +7,7 @@ repository = "https://github.com/flmmkch/skip_bom"
 readme = "README.md"
 authors = ["Victor Nivet <victor@saumon.ninja>"]
 documentation = "https://docs.rs/skip_bom"
-license = "MIR OR Apache-2.0"
+license = "MIT OR Apache-2.0"
 categories = ["parsing", "encoding", "filesystem"]
 keywords = ["BOM", "read"]
 
