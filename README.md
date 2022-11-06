@@ -1,5 +1,10 @@
 # skip_bom
 
+[![Build status](https://github.com/flmmkch/skip_bom/workflows/ci/badge.svg)](https://github.com/flmmkch/skip_bom/actions)
+[![Rust](https://img.shields.io/badge/rust-1.57.0%2B-blue.svg?maxAge=3600)](https://github.com/flmmkch/skip_bom)
+[![crates.io](https://img.shields.io/crates/v/skip_bom.svg)](https://crates.io/crates/skip_bom)
+[![docs.rs](https://img.shields.io/docsrs/skip_bom?maxAge=3600)](https://docs.rs/skip_bom)
+
 Skip the optional encoding BOM at the start of an I/O stream if it exists.
 The `SkipEncodingBom` data structure does not make any dynamic allocations and supports progressive stream reads.
 As of now, only the UTF-8 BOM is supported.
@@ -58,7 +63,7 @@ assert_eq!(Some(BomType::UTF8), reader.bom_found().unwrap());
 
 ## References
 
-* [The official Unicode FAQ](https://www.unicode.org/faq/utf_bom.html).
+* [The official Unicode FAQ](https://www.unicode.org/faq/utf_bom.html)
 
 ## Documentation
 
