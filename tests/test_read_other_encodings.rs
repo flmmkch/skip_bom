@@ -1,30 +1,34 @@
 use skip_bom::*;
 use std::io::{Cursor, Read};
 
+fn test_read_bom_type(bom_type: BomType) {
+    let mut bytes = Vec::new();
+    bytes.extend(bom_type.bom_bytes());
+    bytes.extend(b"This stream has a BOM.");
+    // with a BOM read at the start
+    {
+        let mut reader = SkipEncodingBom::new(BomType::all(), Cursor::new(bytes.as_slice()));
+        let mut buf = Default::default();
+        assert_eq!(Some(bom_type), reader.read_bom().unwrap());
+        let _ = reader.read_to_end(&mut buf).unwrap();
+        assert_eq!(b"This stream has a BOM.", buf.as_slice());
+        assert_eq!(Some(bom_type), reader.bom_found().unwrap());
+    }
+    // without a BOM read at the start
+    {
+        let mut reader = SkipEncodingBom::new(BomType::all(), Cursor::new(bytes.as_slice()));
+        let mut buf = Default::default();
+        let _ = reader.read_to_end(&mut buf).unwrap();
+        assert_eq!(b"This stream has a BOM.", buf.as_slice());
+        assert_eq!(Some(bom_type), reader.bom_found().unwrap());
+    }
+}
+
 macro_rules! test_read_bom_type {
     ($test_fn_name:ident, $bom:expr) => {
         #[test]
         fn $test_fn_name() {
-            let mut bytes = Vec::new();
-            bytes.extend($bom.bom_bytes());
-            bytes.extend(b"This stream has a BOM.");
-            // with a BOM read at the start
-            {
-                let mut reader = SkipEncodingBom::new(Cursor::new(bytes.as_slice()));
-                let mut buf = Default::default();
-                assert_eq!(Some($bom), reader.read_bom().unwrap());
-                let _ = reader.read_to_end(&mut buf).unwrap();
-                assert_eq!(b"This stream has a BOM.", buf.as_slice());
-                assert_eq!(Some($bom), reader.bom_found().unwrap());
-            }
-            // without a BOM read at the start
-            {
-                let mut reader = SkipEncodingBom::new(Cursor::new(bytes.as_slice()));
-                let mut buf = Default::default();
-                let _ = reader.read_to_end(&mut buf).unwrap();
-                assert_eq!(b"This stream has a BOM.", buf.as_slice());
-                assert_eq!(Some($bom), reader.bom_found().unwrap());
-            }
+            test_read_bom_type($bom);
         }
     };
 }

@@ -1,13 +1,12 @@
-use skip_bom::{BomType, SkipEncodingBom};
+use skip_bom::BomType;
 use std::io::{Cursor, Read};
 
-fn skip_bom_reader_from_bytes<'a>(bytes: &'a [u8]) -> SkipEncodingBom<Cursor<&'a [u8]>> {
-    SkipEncodingBom::new(Cursor::new(bytes))
-}
+mod utf8_bom_test_utils;
+use utf8_bom_test_utils::*;
 
 #[test]
 fn test_skip_bom() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEF\xBB\xBFThis stream has a BOM.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEF\xBB\xBFThis stream has a BOM.");
     let mut string = Default::default();
     let _ = reader.read_to_string(&mut string).unwrap();
     assert_eq!(Some(Some(BomType::UTF8)), reader.bom_found());
@@ -16,7 +15,7 @@ fn test_skip_bom() {
 
 #[test]
 fn test_skip_bom_empty_file() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEF\xBB\xBF");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEF\xBB\xBF");
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(Some(Some(BomType::UTF8)), reader.bom_found());
@@ -25,7 +24,7 @@ fn test_skip_bom_empty_file() {
 
 #[test]
 fn test_skip_no_bom() {
-    let mut reader = skip_bom_reader_from_bytes(b"This stream has no BOM.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"This stream has no BOM.");
     let mut string = Default::default();
     let _ = reader.read_to_string(&mut string).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -34,7 +33,7 @@ fn test_skip_no_bom() {
 
 #[test]
 fn test_skip_no_starting_bom() {
-    let mut reader = skip_bom_reader_from_bytes(b"This stream has no starting BOM\xEF\xBB\xBF.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"This stream has no starting BOM\xEF\xBB\xBF.");
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -43,7 +42,7 @@ fn test_skip_no_starting_bom() {
 
 #[test]
 fn test_skip_small_buffer_1_bom() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEF\xBB\xBFThis stream has a BOM.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEF\xBB\xBFThis stream has a BOM.");
     let mut small_buf = [0u8; 1];
     let bytes_read = reader.read(small_buf.as_mut_slice()).unwrap();
     assert_eq!(Some(Some(BomType::UTF8)), reader.bom_found());
@@ -53,7 +52,7 @@ fn test_skip_small_buffer_1_bom() {
 
 #[test]
 fn test_skip_small_buffer_2_bom() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEF\xBB\xBFThis stream has a BOM.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEF\xBB\xBFThis stream has a BOM.");
     let mut small_buf = [0u8; 2];
     let bytes_read = reader.read(small_buf.as_mut_slice()).unwrap();
     assert_eq!(Some(Some(BomType::UTF8)), reader.bom_found());
@@ -67,7 +66,7 @@ fn test_skip_small_buffer_2_bom() {
 
 #[test]
 fn test_skip_small_buffer_no_bom() {
-    let mut reader = skip_bom_reader_from_bytes(b"This stream has no BOM.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"This stream has no BOM.");
     let mut small_buf = [0u8; 2];
     let bytes_read = reader.read(small_buf.as_mut_slice()).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -81,7 +80,7 @@ fn test_skip_small_buffer_no_bom() {
 
 #[test]
 fn test_skip_small_buffer_no_bom_after_start() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEF\xBBThis stream has no BOM.");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEF\xBBThis stream has no BOM.");
     let mut small_buf = [0u8; 2];
     let bytes_read = reader.read(small_buf.as_mut_slice()).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -99,7 +98,7 @@ fn test_skip_small_buffer_no_bom_after_start() {
 
 #[test]
 fn test_skip_no_bom_with_bom_length() {
-    let mut reader = skip_bom_reader_from_bytes(b"Thi");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"Thi");
     let mut string = Default::default();
     let _ = reader.read_to_string(&mut string).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -108,7 +107,7 @@ fn test_skip_no_bom_with_bom_length() {
 
 #[test]
 fn test_skip_no_bom_short() {
-    let mut reader = skip_bom_reader_from_bytes(b"Th");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"Th");
     let mut string = Default::default();
     let _ = reader.read_to_string(&mut string).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -117,7 +116,7 @@ fn test_skip_no_bom_short() {
 
 #[test]
 fn test_skip_bom_short_with_same_start() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEFa");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEFa");
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(Some(None), reader.bom_found());
@@ -126,7 +125,7 @@ fn test_skip_bom_short_with_same_start() {
 
 #[test]
 fn test_skip_bom_short() {
-    let mut reader = skip_bom_reader_from_bytes(b"\xEF\xBB");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"\xEF\xBB");
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(None, reader.bom_found());
@@ -135,7 +134,7 @@ fn test_skip_bom_short() {
 
 #[test]
 fn test_skip_empty_stream() {
-    let mut reader = skip_bom_reader_from_bytes(b"");
+    let mut reader = skip_utf8_bom_reader_from_byte_slice(b"");
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(None, reader.bom_found());
@@ -144,7 +143,7 @@ fn test_skip_empty_stream() {
 
 #[test]
 fn test_skip_bom_progressive() {
-    let mut reader = SkipEncodingBom::new(Cursor::new(b"\xEF\xBB".to_vec()));
+    let mut reader = skip_utf8_bom_reader(Cursor::new(b"\xEF\xBB".to_vec()));
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(0, buf.len(), "{:?}", buf.as_slice());
@@ -157,7 +156,7 @@ fn test_skip_bom_progressive() {
 
 #[test]
 fn test_skip_no_bom_progressive() {
-    let mut reader = SkipEncodingBom::new(Cursor::new(b"\xEF\xBB".to_vec()));
+    let mut reader = skip_utf8_bom_reader(Cursor::new(b"\xEF\xBB".to_vec()));
     let mut buf = Default::default();
     let _ = reader.read_to_end(&mut buf).unwrap();
     assert_eq!(0, buf.len(), "{:?}", buf.as_slice());

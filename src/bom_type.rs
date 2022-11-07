@@ -76,17 +76,19 @@ impl BomType {
     /// * `Ok((Some(bom_type), additional_bytes_slice))` if `tested_bytes` is certain to start with the `bom_type` BOM.
     /// * `Ok((None, bytes_slice))` if `tested_bytes` is certain not to be any BOM.
     /// * `Err(())` otherwise.
-    pub fn try_find_bytes_bom<'a>(tested_bytes: &'a [u8]) -> AllBomsBytesTest<'a> {
+    pub fn try_find_bytes_bom<'a>(tested_bytes: &'a [u8], bom_types_tested: &[BomType]) -> BomsBytesTest<'a> {
         use BomType::*;
 
-        let mut result = AllBomsBytesTest::Complete { bom_type: None, additional_bytes: tested_bytes };
+        let mut result = BomsBytesTest::Complete { bom_type: None, additional_bytes: tested_bytes };
 
         macro_rules! try_encoding {
             ($encoding:expr) => {
-                match $encoding.test_bytes(tested_bytes) {
-                    BomBytesTest::Incomplete => result = AllBomsBytesTest::Incomplete,
-                    BomBytesTest::NotBom => (),
-                    BomBytesTest::StartsWithBom => return AllBomsBytesTest::Complete { bom_type: Some($encoding), additional_bytes: &tested_bytes[$encoding.bom_length()..] },
+                if bom_types_tested.contains(&$encoding) {
+                    match $encoding.test_bytes(tested_bytes) {
+                        BomBytesTest::Incomplete => result = BomsBytesTest::Incomplete,
+                        BomBytesTest::NotBom => (),
+                        BomBytesTest::StartsWithBom => return BomsBytesTest::Complete { bom_type: Some($encoding), additional_bytes: &tested_bytes[$encoding.bom_length()..] },
+                    }
                 }
             };
         }
@@ -105,30 +107,49 @@ impl BomType {
 
         result
     }
+
+    /// Get a slice containing a list of all BOM types available.
+    pub fn all() -> &'static [BomType] {
+        use BomType::*;
+        &[
+            UTF8,
+            UTF32LE,
+            UTF32BE,
+            UTF16LE,
+            UTF16BE,
+            UTF7,
+            UTF1,
+            UTFEBDIC,
+            SCSU,
+            BOCU1,
+            GB1803,
+        ]
+    }
 }
 
-/// Test result for the compatibility with a single BOM
+/// Test result for the compatibility with a single BOM.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BomBytesTest {
-    /// Incomplete
+    /// The byte array tested is not long enough to confirm whether the BOM is present or absent.
     Incomplete,
-    /// Incompatible with the BOM 
+    /// The byte array tested is confirmed not to start with the BOM.
     NotBom,
-    /// Starts with the complete BOM
+    /// The byte array tested is confirmed to start with the BOM.
     StartsWithBom,
 }
 
-/// Test result for the compatibility with any BOM
+/// Test result for the compatibility with multiple BOMs.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AllBomsBytesTest<'a> {
-    /// Incomplete
+pub enum BomsBytesTest<'a> {
+    /// The byte array tested is not long enough to confirm whether one of the BOMs is present.
     Incomplete,
-    /// Complete
+    /// The byte array tested is confirmed to start with either one of the BOMs or none of them.
     Complete {
-        /// the BOM type found or `None` if there is no compatible BOM
+        /// The BOM type found or `None` if there is no compatible BOM.
         bom_type: Option<BomType>,
+        /// Additional bytes found in the tested buffer after the BOM.
         additional_bytes: &'a [u8],
     },
 }

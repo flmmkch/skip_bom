@@ -1,6 +1,6 @@
 use std::io::{Cursor, Read};
 
-use super::{AllBomsBytesTest, BomType, BomBytesArray, BomBytesPushBuffer, Result};
+use super::{BomsBytesTest, BomType, BomBytesArray, BomBytesPushBuffer, Result};
 
 /// Reader BOM skipping state
 #[derive(Debug, Clone)]
@@ -36,7 +36,7 @@ impl BomState {
         }
     }
 
-    pub fn try_read_bom<R: Read>(start_bytes: &BomBytesPushBuffer, reader: &mut R) -> Result<TryReadBomResult> {
+    pub fn try_read_bom<R: Read>(start_bytes: &BomBytesPushBuffer, reader: &mut R, bom_types: &[BomType]) -> Result<TryReadBomResult> {
         // read into the start_bytes buffer
         let mut new_start_bytes_buffer = BomBytesArray::default();
         let start_bytes_slice = start_bytes.bytes();
@@ -46,13 +46,13 @@ impl BomState {
         let read_slice = &mut new_start_bytes_buffer[start_bytes_slice.len()..];
         let current_bytes_read = reader.read(read_slice)?;
         let total_bom_bytes_read = start_bytes_slice.len() + current_bytes_read;
-        match BomType::try_find_bytes_bom(&new_start_bytes_buffer[..total_bom_bytes_read]) {
+        match BomType::try_find_bytes_bom(&new_start_bytes_buffer[..total_bom_bytes_read], bom_types) {
             // the BOM presence was determined
-            AllBomsBytesTest::Complete { bom_type, additional_bytes } => {
+            BomsBytesTest::Complete { bom_type, additional_bytes } => {
                 let bytes_after_bom = BomBytesPushBuffer::from_slice(additional_bytes);
                 Ok(TryReadBomResult::Complete { bom_type, bytes_after_bom })
             },
-            AllBomsBytesTest::Incomplete => {
+            BomsBytesTest::Incomplete => {
                 let bytes_after_bom = BomBytesPushBuffer::from_array(new_start_bytes_buffer, total_bom_bytes_read);
                 Ok(TryReadBomResult::Incomplete(bytes_after_bom))
             }

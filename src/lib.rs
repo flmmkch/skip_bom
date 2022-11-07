@@ -8,7 +8,7 @@
 //! 
 //! // Read a stream after checking that it starts with the BOM
 //! const BOM_BYTES: &'static [u8] = b"\xEF\xBB\xBFThis stream starts with a UTF-8 BOM.";
-//! let mut reader = SkipEncodingBom::new(Cursor::new(BOM_BYTES));
+//! let mut reader = SkipEncodingBom::new(BomType::all(), Cursor::new(BOM_BYTES));
 //! assert_eq!(Some(BomType::UTF8), reader.read_bom().unwrap());
 //! let mut string = Default::default();
 //! let _ = reader.read_to_string(&mut string).unwrap();
@@ -16,14 +16,14 @@
 //! 
 //! // Read a stream without a starting BOM
 //! const NO_BOM_BYTES: &'static [u8] = b"This stream does not start with the UTF-8 BOM: \xEF\xBB\xBF.";
-//! let mut reader = SkipEncodingBom::new(Cursor::new(NO_BOM_BYTES));
+//! let mut reader = SkipEncodingBom::new(BomType::all(), Cursor::new(NO_BOM_BYTES));
 //! assert_eq!(None, reader.read_bom().unwrap());
 //! let mut buf = Default::default();
 //! let _ = reader.read_to_end(&mut buf).unwrap();
 //! assert_eq!(b"This stream does not start with the UTF-8 BOM: \xEF\xBB\xBF.", buf.as_slice());
 //! 
 //! // Read a stream and disregard the starting BOM completely
-//! let mut reader = SkipEncodingBom::new(Cursor::new(BOM_BYTES));
+//! let mut reader = SkipEncodingBom::new(BomType::all(), Cursor::new(BOM_BYTES));
 //! let mut buf = Default::default();
 //! let _ = reader.read_to_end(&mut buf).unwrap();
 //! assert_eq!(b"This stream starts with a UTF-8 BOM.", buf.as_slice());
