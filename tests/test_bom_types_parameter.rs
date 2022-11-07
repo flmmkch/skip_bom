@@ -69,3 +69,7 @@ test_read_bom_types_parameter!(test_read_utfebdic_bom_only_some, BomType::UTFEBD
 test_read_bom_types_parameter!(test_read_scsu_bom_only_some, BomType::SCSU, ONLY_SOME_BOMS, false);
 test_read_bom_types_parameter!(test_read_bocu1_bom_only_some, BomType::BOCU1, ONLY_SOME_BOMS, false);
 test_read_bom_types_parameter!(test_read_gb1803_bom_only_some, BomType::GB1803, ONLY_SOME_BOMS, false);
+
+// test that UTF-16 Little Endian and UTF-32 Big Endian are not confused
+test_read_bom_types_parameter!(test_read_utf16le_utf32be, BomType::UTF32BE, &[BomType::UTF16LE, BomType::UTF32BE], true);
+test_read_bom_types_parameter!(test_read_utf32be_utf16le, BomType::UTF32BE, &[BomType::UTF32BE, BomType::UTF16LE], true);
