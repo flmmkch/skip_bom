@@ -50,7 +50,7 @@ This crate supports I/O streams that are incomplete at first and receive data la
 use skip_bom::{BomType, SkipEncodingBom};
 use std::io::{Cursor, Read};
 
-let mut reader = SkipEncodingBom::new(BomType::all(), Cursor::new(b"\xEF\xBB".to_vec()));
+let mut reader = SkipEncodingBom::new(&[BomType::UTF8], Cursor::new(b"\xEF\xBB".to_vec()));
 let mut buf = Default::default();
 let _ = reader.read_to_end(&mut buf).unwrap();
 // The stream is incomplete: there are only the first two bytes of the BOM yet
