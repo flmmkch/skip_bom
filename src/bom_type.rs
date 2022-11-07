@@ -73,7 +73,7 @@ impl BomType {
     }
 
     /// Returns:
-    /// * `Ok((Some(bom_type), additional_bytes_slice)) if `tested_bytes` is certain to start with the `bom_type` BOM.
+    /// * `Ok((Some(bom_type), additional_bytes_slice))` if `tested_bytes` is certain to start with the `bom_type` BOM.
     /// * `Ok((None, bytes_slice))` if `tested_bytes` is certain not to be any BOM.
     /// * `Err(())` otherwise.
     pub fn try_find_bytes_bom<'a>(tested_bytes: &'a [u8]) -> AllBomsBytesTest<'a> {
