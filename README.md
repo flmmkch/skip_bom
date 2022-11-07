@@ -70,7 +70,7 @@ assert_eq!(Some(BomType::UTF8), reader.bom_found().unwrap());
 
 ## Documentation
 
-[Module documentation with examples](https://docs.rs/skip_bom).
+[Module documentation with examples](https://docs.rs/skip_bom)
 
 ## License
 
