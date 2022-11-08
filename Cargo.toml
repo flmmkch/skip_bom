@@ -2,7 +2,7 @@
 name = "skip_bom"
 version = "0.5.0"
 edition = "2018"
-description = "Skip the optional encoding BOM at the start of a file if it exists."
+description = "Skip the optional encoding Byte Order Mark (BOM) at the start of a file if it exists."
 repository = "https://github.com/flmmkch/skip_bom"
 readme = "README.md"
 authors = ["Victor Nivet <victor@saumon.ninja>"]
