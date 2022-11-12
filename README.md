@@ -5,7 +5,7 @@
 [![crates.io](https://img.shields.io/crates/v/skip_bom.svg)](https://crates.io/crates/skip_bom)
 [![docs.rs](https://img.shields.io/docsrs/skip_bom?maxAge=3600)](https://docs.rs/skip_bom)
 
-Skip the optional encoding BOM ([Byte Order Mark](https://www.unicode.org/faq/utf_bom.html#BOM)) at the start of an I/O stream if it exists.
+Detect and skip the optional encoding BOM ([Byte Order Mark](https://www.unicode.org/faq/utf_bom.html#BOM)) at the start of an I/O stream if it exists.
 
 The `SkipEncodingBom` data structure does not make any dynamic allocations and supports progressive stream reads.
 
